@@ -2,6 +2,7 @@ from redmail import gmail
 from postoffice.office import Office
 from postoffice.commands import Commands, Help
 
+
 def main():
     home_office:Office
     office_space = {}
@@ -9,6 +10,7 @@ def main():
     print("WELCOME TO MAILMAN!")
     while True:
         print("Please enter command")
+        
         cmd = input()
         match cmd:
             case Commands.EXIT:
