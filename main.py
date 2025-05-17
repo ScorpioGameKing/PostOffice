@@ -1,3 +1,4 @@
+import logging
 from redmail import gmail
 from postoffice.office import Office
 from postoffice.commands import Commands, Help
@@ -10,9 +11,18 @@ from pytermgui import (
     Container
 )
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='debug.log', encoding='utf-8', format='%(levelname)s:%(message)s', filemode='w', level=logging.DEBUG)
+logger.info("Logger Initialized")
+
+home_office:Office
+office_directory = {}
+logger.info("Blank Directory and Home ref created")
+
 def offices() -> WindowManager:
 
     def swap(manager:WindowManager, new_window:Window, old_window:Window|None=None):
+        logger.debug("Swapping window to %s", new_window.title.split("]")[1])
         if old_window:
             manager.remove(old_window)
         manager.add(new_window)
@@ -31,22 +41,28 @@ def offices() -> WindowManager:
                 swap(manager, new_window, window)
 
             case Commands.CREATE_OFFICE:
-                pass
+                new_window = create_office_prompt(manager)
+                swap(manager, new_window, window)
 
             case Commands.CLOSE_OFFICE:
-                pass
+                new_window = close_office_prompt(manager)
+                swap(manager, new_window, window)
 
             case Commands.HIRE_MAILMAN:
-                pass
+                new_window = hire_mailman_prompt(manager)
+                swap(manager, new_window, window)
 
             case Commands.FIRE_MAILMAN:
-               pass
+                new_window = fire_mailman_prompt(manager)
+                swap(manager, new_window, window)
 
             case Commands.SET_ACTIVE_MAILMAN:
-                pass
+                new_window = set_active_mailman_prompt(manager)
+                swap(manager, new_window, window)
 
             case Commands.SEND_MAIL:
-                pass
+                new_window = send_mail_prompt(manager)
+                swap(manager, new_window, window)
 
             case _:
                 new_window = unrecognized(manager)
@@ -101,6 +117,104 @@ def offices() -> WindowManager:
         )
         return window
     
+    def create_office_prompt(manager:WindowManager) -> Window:
+        window = (
+            Window(
+                "",
+                "WIP",
+                "",
+                ["Continue", lambda *_: cont(manager, window)],
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Create Office")
+        )
+        return window
+
+    def open_office_prompt(manager:WindowManager) -> Window:
+        window = (
+            Window(
+                "",
+                "WIP",
+                "",
+                ["Continue", lambda *_: cont(manager, window)],
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Open Office")
+        )
+        return window
+
+    def close_office_prompt(manager:WindowManager) -> Window:
+        window = (
+            Window(
+                "",
+                "WIP",
+                "",
+                ["Continue", lambda *_: cont(manager, window)],
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Close Office")
+        )
+        return window
+
+    def hire_mailman_prompt(manager:WindowManager) -> Window:
+        window = (
+            Window(
+                "",
+                "WIP",
+                "",
+                ["Continue", lambda *_: cont(manager, window)],
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Hire Mailman")
+        )
+        return window
+
+    def fire_mailman_prompt(manager:WindowManager) -> Window:
+        window = (
+            Window(
+                "",
+                "WIP",
+                "",
+                ["Continue", lambda *_: cont(manager, window)],
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Fire Mailman")
+        )
+        return window
+
+    def set_active_mailman_prompt(manager:WindowManager) -> Window:
+        window = (
+            Window(
+                "",
+                "WIP",
+                "",
+                ["Continue", lambda *_: cont(manager, window)],
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Choose Mailman")
+        )
+        return window
+
+    def send_mail_prompt(manager:WindowManager) -> Window:
+        window = (
+            Window(
+                "",
+                "WIP",
+                "",
+                ["Continue", lambda *_: cont(manager, window)],
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Send Mail")
+        )
+        return window
+    
     def unrecognized(manager:WindowManager) -> Window:
         window = (
             Window(
@@ -121,7 +235,6 @@ def offices() -> WindowManager:
     return manager
 
 def main():
-    home_office:Office
     office_space = offices()
     office_space.run()
 
@@ -137,17 +250,11 @@ def main():
                 print(_ofc)
                 home_office = office_space[_ofc]
 
-            case Commands.CLOSE_OFFICE:
-                print("Not Supported Yet")
-
             case Commands.HIRE_MAILMAN:
                 print("Hire a Mailman")
                 _usr = input("Enter an email: ")
                 _pas = input("Enter GApp Password: ")
                 home_office.hireMailman(_usr, _pas)
-            
-            case Commands.FIRE_MAILMAN:
-                print("Not Supported Yet")
 
             case Commands.SET_ACTIVE_MAILMAN:
                 _active = input("Choose the Mailman to use: ")
