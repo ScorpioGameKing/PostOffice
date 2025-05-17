@@ -8,7 +8,8 @@ from pytermgui import (
     InputField,
     WindowManager,
     YamlLoader,
-    Container
+    Container,
+    Label
 )
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ def offices() -> WindowManager:
         swap(manager, prompt, window)
 
     def run_command(manager:WindowManager, window:Window, cmd:str):
+        logger.debug("Command was %s", cmd)
         match cmd:
             case Commands.EXIT:
                 exit_office(manager, window)
@@ -41,6 +43,10 @@ def offices() -> WindowManager:
                 swap(manager, new_window, window)
 
             case Commands.CREATE_OFFICE:
+                new_window = create_office_prompt(manager)
+                swap(manager, new_window, window)
+            
+            case Commands.OPEN_OFFICE:
                 new_window = create_office_prompt(manager)
                 swap(manager, new_window, window)
 
@@ -76,7 +82,7 @@ def offices() -> WindowManager:
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
                 "",
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Welcome Menu")
@@ -91,7 +97,7 @@ def offices() -> WindowManager:
                 cmd,
                 "",
                 ["Run Command", lambda *_: run_command(manager, window, cmd.value)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Command Prompt")
@@ -104,13 +110,16 @@ def offices() -> WindowManager:
         exit()
     
     def show_help(manager:WindowManager) -> Window:
+        cmds = ""
+        for cmd in Help:
+            cmds += f"{cmd}\n"
         window = (
             Window(
                 "",
-                "WIP",
+                Label(cmds, parent_align=0),
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Command Help")
@@ -124,7 +133,7 @@ def offices() -> WindowManager:
                 "WIP",
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Create Office")
@@ -138,7 +147,7 @@ def offices() -> WindowManager:
                 "WIP",
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Open Office")
@@ -152,7 +161,7 @@ def offices() -> WindowManager:
                 "WIP",
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Close Office")
@@ -166,7 +175,7 @@ def offices() -> WindowManager:
                 "WIP",
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Hire Mailman")
@@ -180,7 +189,7 @@ def offices() -> WindowManager:
                 "WIP",
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Fire Mailman")
@@ -194,7 +203,7 @@ def offices() -> WindowManager:
                 "WIP",
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Choose Mailman")
@@ -208,7 +217,7 @@ def offices() -> WindowManager:
                 "WIP",
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Send Mail")
@@ -222,7 +231,7 @@ def offices() -> WindowManager:
                 "Command not recognized",
                 "",
                 ["Continue", lambda *_: cont(manager, window)],
-                width=60,
+                width=135,
                 box="DOUBLE",
             )
             .set_title("[210 bold]Unrecongized Command")
