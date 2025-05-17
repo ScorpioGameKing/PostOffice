@@ -25,21 +25,29 @@ def offices() -> WindowManager:
         match cmd:
             case Commands.EXIT:
                 exit_office(manager, window)
+
             case Commands.HELP:
                 new_window = show_help(manager)
                 swap(manager, new_window, window)
+
             case Commands.CREATE_OFFICE:
                 pass
+
             case Commands.CLOSE_OFFICE:
                 pass
+
             case Commands.HIRE_MAILMAN:
                 pass
+
             case Commands.FIRE_MAILMAN:
                pass
+
             case Commands.SET_ACTIVE_MAILMAN:
                 pass
+
             case Commands.SEND_MAIL:
                 pass
+
             case _:
                 new_window = unrecognized(manager)
                 swap(manager, new_window, window)
@@ -118,20 +126,7 @@ def main():
     office_space.run()
 
     '''
-    print("Welcome To PostOffice Version 0.0.1")
-    while True:
-        print("Please enter command")
-        
-        cmd = input()
-        match cmd:
-            case Commands.EXIT:
-                print("Exiting PostOffice, have a nice day!")
-                exit()
-
-            case Commands.HELP:
-                for tip in Help:
-                    print(tip)
-
+    TODO
             case Commands.CREATE_OFFICE:
                 _ofc_name = input("Please enter a name for the Office: ")
                 _temp_ofc = Office(gmail)
@@ -163,9 +158,6 @@ def main():
                 _topic = input("Enter a subject: ")
                 _body = input("Type your msg: ")
                 home_office.sendMail(_topic, _reciver, _body)
-
-            case _:
-                print("Command not reconigzed")
     '''
 
 if __name__ == "__main__":
