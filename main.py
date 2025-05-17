@@ -16,30 +16,96 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(filename='debug.log', encoding='utf-8', format='%(levelname)s:%(message)s', filemode='w', level=logging.DEBUG)
 logger.info("Logger Initialized")
 
-home_office:Office
-office_directory = {}
-logger.info("Blank Directory and Home ref created")
-
 def offices() -> WindowManager:
 
-    def swap(manager:WindowManager, new_window:Window, old_window:Window|None=None):
+    home_office = Office()
+    office_directory = {}
+    logger.info(f"Blank Directory [{office_directory}] and Home ref created")
+
+    with YamlLoader() as loader, open("./modtest/ui/testUI.yml", "r") as datafile:
+        loader.load(datafile)
+
+    def swap(manager:WindowManager, new_window:Window, old_window:Window|None=None) -> None:
         logger.debug("Swapping window to %s", new_window.title.split("]")[1])
         if old_window:
             manager.remove(old_window)
         manager.add(new_window)
     
-    def cont(manager:WindowManager, window:Window):
+    def cont(manager:WindowManager, window:Window) -> None:
+        logger.debug("Continued")
         prompt = user_prompt(manager)
         swap(manager, prompt, window)
 
-    def run_command(manager:WindowManager, window:Window, cmd:str):
-        logger.debug("Command was %s", cmd)
+    def exit_office(manager:WindowManager, window:Window) -> None:
+        logger.debug("Exiting Via Command")
+        manager.remove(window)
+        manager.stop()
+        exit()
+
+    def create_new_office(manager:WindowManager, window:Window, service:str, service_name:str) -> None:
+        logger.debug(f"Trying to create Office for [{service}] with name [{service_name}]")
+        try:
+            temp_ofc = Office()
+            temp_ofc.set_service(gmail)
+            office_directory.update({service_name : temp_ofc})
+            success = success_prompt(manager)
+            swap(manager, success, window)
+        except:
+            failure = failure_prompt(manager)
+            swap(manager, failure, window)
+
+    def open_office(manager:WindowManager, window:Window, ofc:str) -> None:
+        logger.debug(f"Trying to Open Office for with name [{ofc}]")
+        try:
+            home_office = office_directory[ofc]
+            success = success_prompt(manager)
+            swap(manager, success, window)
+            logger.info(f"Opened [{home_office._office_service}]")
+        except:
+            failure = failure_prompt(manager)
+            swap(manager, failure, window)
+
+    def hire_mailman(manager:WindowManager, window:Window, username:str, password:str) -> None:
+        logger.debug(f"Trying to create Mailman for [{username}]")
+        logger.debug(f"Current Home Office: [{home_office._office_service}]")
+        try:
+            home_office.hireMailman(username, password)
+            success = success_prompt(manager)
+            swap(manager, success, window)
+        except:
+            failure = failure_prompt(manager)
+            swap(manager, failure, window)
+
+    def set_active_mailman(manager:WindowManager, window:Window, username:str) -> None:
+        logger.debug(f"Trying to set [{username}] as Active")
+        logger.debug(f"Current Home Office: [{home_office._office_service}]")
+        try:
+            home_office.setActiveMailman(username)
+            success = success_prompt(manager)
+            swap(manager, success, window)
+        except:
+            failure = failure_prompt(manager)
+            swap(manager, failure, window)
+
+    def send_mail(manager:WindowManager, window:Window, reciver:str, topic:str, body:str) -> None:
+        logger.debug(f"Trying send Email to [{reciver}] with subject [{topic}] and body [{body}]")
+        logger.debug(f"Current Home Office: [{home_office._office_service}]")
+        try:
+            home_office.sendMail(_topic, _reciver, _body)
+            success = success_prompt(manager)
+            swap(manager, success, window)
+        except:
+            failure = failure_prompt(manager)
+            swap(manager, failure, window)
+
+    def run_command(manager:WindowManager, window:Window, cmd:str) -> None:
+        logger.debug(f"Command: [{cmd}]")
         match cmd:
             case Commands.EXIT:
                 exit_office(manager, window)
 
             case Commands.HELP:
-                new_window = show_help(manager)
+                new_window = help_prompt(manager)
                 swap(manager, new_window, window)
 
             case Commands.CREATE_OFFICE:
@@ -47,7 +113,7 @@ def offices() -> WindowManager:
                 swap(manager, new_window, window)
             
             case Commands.OPEN_OFFICE:
-                new_window = create_office_prompt(manager)
+                new_window = open_office_prompt(manager)
                 swap(manager, new_window, window)
 
             case Commands.CLOSE_OFFICE:
@@ -71,10 +137,10 @@ def offices() -> WindowManager:
                 swap(manager, new_window, window)
 
             case _:
-                new_window = unrecognized(manager)
+                new_window = unrecognized_prompt(manager)
                 swap(manager, new_window, window)
 
-    def welcome_menu(manager:WindowManager) -> Window:
+    def welcome_prompt(manager:WindowManager) -> Window:
         window = (
             Window(
                 "",
@@ -103,13 +169,37 @@ def offices() -> WindowManager:
             .set_title("[210 bold]Command Prompt")
         )
         return window
+
+    def success_prompt(manager:WindowManager) -> Window:
+        window = (
+            Window(
+                "Success!",
+                "",
+                ["Return", lambda *_: cont(manager, window)],
+                "",
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Success")
+        )
+        return window
     
-    def exit_office(manager:WindowManager, window:Window) -> None:
-        manager.remove(window)
-        manager.stop()
-        exit()
+    def failure_prompt(manager:WindowManager) -> Window:
+        logger.warning("FAILURE IS AN OPTION")
+        window = (
+            Window(
+                "Failure",
+                "",
+                ["Return", lambda *_: cont(manager, window)],
+                "",
+                width=60,
+                box="DOUBLE",
+            )
+            .set_title("[210 bold]Failure")
+        )
+        return window
     
-    def show_help(manager:WindowManager) -> Window:
+    def help_prompt(manager:WindowManager) -> Window:
         cmds = ""
         for cmd in Help:
             cmds += f"{cmd}\n"
@@ -127,12 +217,17 @@ def offices() -> WindowManager:
         return window
     
     def create_office_prompt(manager:WindowManager) -> Window:
+        service = InputField("gmail", prompt="Enter Email Service: ")
+        service_name = InputField("", prompt="Enter Service Name: ")
         window = (
             Window(
                 "",
-                "WIP",
+                service,
                 "",
-                ["Continue", lambda *_: cont(manager, window)],
+                service_name,
+                "",
+                ["Create", lambda *_: create_new_office(manager, window, service.value, service_name.value)],
+                "",
                 width=135,
                 box="DOUBLE",
             )
@@ -141,12 +236,13 @@ def offices() -> WindowManager:
         return window
 
     def open_office_prompt(manager:WindowManager) -> Window:
+        ofc = InputField("", prompt="Choose an Office to use: ")
         window = (
             Window(
                 "",
-                "WIP",
+                ofc,
                 "",
-                ["Continue", lambda *_: cont(manager, window)],
+                ["Open", lambda *_: open_office(manager, window, ofc.value)],
                 width=135,
                 box="DOUBLE",
             )
@@ -169,12 +265,17 @@ def offices() -> WindowManager:
         return window
 
     def hire_mailman_prompt(manager:WindowManager) -> Window:
+        username = InputField("", prompt="Enter Email: ")
+        password = InputField("", prompt="Enter GPass: ")
+        password.styles["value"] = "invisible"
         window = (
             Window(
                 "",
-                "WIP",
+                username,
                 "",
-                ["Continue", lambda *_: cont(manager, window)],
+                password,
+                "",
+                ["Create", lambda *_: hire_mailman(manager, window, username.value, password.value)],
                 width=135,
                 box="DOUBLE",
             )
@@ -197,12 +298,13 @@ def offices() -> WindowManager:
         return window
 
     def set_active_mailman_prompt(manager:WindowManager) -> Window:
+        username = InputField("", prompt="Choose the Mailman to use: ")
         window = (
             Window(
                 "",
-                "WIP",
+                username,
                 "",
-                ["Continue", lambda *_: cont(manager, window)],
+                ["Continue", lambda *_: set_active_mailman(manager, window, username.value)],
                 width=135,
                 box="DOUBLE",
             )
@@ -211,12 +313,24 @@ def offices() -> WindowManager:
         return window
 
     def send_mail_prompt(manager:WindowManager) -> Window:
+        reciver = InputField("", prompt="Enter a reciving Email: ")
+        topic = InputField("", prompt="Enter a subject: ")
+        body = InputField("")
+        body.multiline = True
         window = (
             Window(
                 "",
-                "WIP",
+                reciver,
                 "",
-                ["Continue", lambda *_: cont(manager, window)],
+                topic,
+                "",
+                Container(
+                    "Email Body:",
+                    body,
+                    box="EMPTY_VERTICAL",
+                ),
+                "",
+                ["Continue", lambda *_: send_mail(manager, window, reciver.value, topic.value, body.value)],
                 width=135,
                 box="DOUBLE",
             )
@@ -224,7 +338,7 @@ def offices() -> WindowManager:
         )
         return window
     
-    def unrecognized(manager:WindowManager) -> Window:
+    def unrecognized_prompt(manager:WindowManager) -> Window:
         window = (
             Window(
                 "",
@@ -239,42 +353,13 @@ def offices() -> WindowManager:
         return window
     
     manager = WindowManager()
-    welcome = welcome_menu(manager)
+    welcome = welcome_prompt(manager)
     swap(manager, welcome)
     return manager
 
-def main():
+def main() -> None:
     office_space = offices()
     office_space.run()
-
-    '''
-    TODO
-            case Commands.CREATE_OFFICE:
-                _ofc_name = input("Please enter a name for the Office: ")
-                _temp_ofc = Office(gmail)
-                office_space.update({_ofc_name : _temp_ofc})
-
-            case Commands.OPEN_OFFICE:
-                _ofc = input("Choice: ")
-                print(_ofc)
-                home_office = office_space[_ofc]
-
-            case Commands.HIRE_MAILMAN:
-                print("Hire a Mailman")
-                _usr = input("Enter an email: ")
-                _pas = input("Enter GApp Password: ")
-                home_office.hireMailman(_usr, _pas)
-
-            case Commands.SET_ACTIVE_MAILMAN:
-                _active = input("Choose the Mailman to use: ")
-                home_office.setActiveMailman(_active)
-
-            case Commands.SEND_MAIL:
-                _reciver = input("Enter a reciving Email: ")
-                _topic = input("Enter a subject: ")
-                _body = input("Type your msg: ")
-                home_office.sendMail(_topic, _reciver, _body)
-    '''
 
 if __name__ == "__main__":
     system('cls' if name == 'nt' else 'clear')
