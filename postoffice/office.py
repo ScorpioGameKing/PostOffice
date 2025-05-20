@@ -10,6 +10,7 @@ class Office():
 
     def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
+        self._office_service = gmail # Default to gmail
         self._mailmen = {}
         self.logger.info(f"Created Mailman Directory As [{self._mailmen}]")
     
@@ -32,7 +33,7 @@ class Office():
         self._activeMailman = self._mailmen[username]
         self.logger.info(f"Setting Service Username [{self._activeMailman.name}]")
         self._office_service.username = self._activeMailman.name
-        self.logger.info(f"Setting Service Password [{self._activeMailman.password}]")
+        self.logger.info(f"Setting Service Password [{self._activeMailman._password}]")
         self._office_service.password = self._activeMailman._password
         self.logger.info(f"Setting Mailman [{self._mailmen[username]}] to Active")
     
