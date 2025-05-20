@@ -48,6 +48,9 @@ class OfficeDirectory(WindowManager):
                 self.failure_prompt()
 
     def send_mail(self, reciver:str, topic:str, body:str):
+        self.logger.debug(f"Trying to send Email {topic} to {reciver} with body {body}")
+        self.logger.debug(f"Home Office {self.home_office} Active Mailman {self.home_office._activeMailman}")
+        self.logger.debug(f"Mailman User {self.home_office._activeMailman.username} Mail Password {self.home_office._activeMailman._password}")
         try:
             self.home_office.sendMail(topic, reciver, body)
             self.success_prompt()

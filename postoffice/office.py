@@ -28,7 +28,6 @@ class Office():
         self.logger.info(f"Popped Mailman [{username}] from [{self._mailmen}]")
 
     def setActiveMailman(self, username:str):
-        self.logger.info(f"Current Service: [{self._office_service}]")
         self.logger.info(f"Searching for Mailman [{self._mailmen[username]}]")
         self._activeMailman = self._mailmen[username]
         self.logger.info(f"Setting Service Username [{self._activeMailman.name}]")
