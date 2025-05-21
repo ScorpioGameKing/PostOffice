@@ -5,7 +5,7 @@ from os import system, name
 from pytermgui import YamlLoader
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(filename='debug.log', encoding='utf-8', format='%(levelname)s:%(message)s', filemode='w', level=logging.DEBUG)
+logging.basicConfig(filename='./logs/debug.log', encoding='utf-8', format='%(levelname)s:%(message)s', filemode='w', level=logging.DEBUG)
 logger.info("Logger Initialized")
 
 def offices() -> OfficeDirectory:

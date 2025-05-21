@@ -89,6 +89,6 @@ venv.bak/
 # Cython debug symbols
 cython_debug/
 
-secrets.txt
+secrets/
 modtest/
 *.log
