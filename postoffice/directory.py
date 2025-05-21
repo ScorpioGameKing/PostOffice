@@ -326,5 +326,3 @@ class OfficeDirectory(WindowManager):
             .set_title("[210 bold]Unrecongized Command")
         )
         self.swap(window)
-
-    
