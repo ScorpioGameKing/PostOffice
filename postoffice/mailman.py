@@ -5,7 +5,7 @@ class Mailman():
     _password:str
 
     def __init__(self, username:str, password:str):
-        self.name = username
+        self.username = username
         self._password = password
     
     def sendMail(self, service:EmailSender, topic:str, send_to:list[str], body:str):

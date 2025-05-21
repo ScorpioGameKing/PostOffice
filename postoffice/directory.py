@@ -1,6 +1,7 @@
 from pytermgui import WindowManager, Window, Container, InputField, Label
 from postoffice.office import Office
 from postoffice.commands import Commands, Help
+from redmail import gmail
 import logging
 
 class OfficeDirectory(WindowManager):
@@ -24,7 +25,10 @@ class OfficeDirectory(WindowManager):
     def create_new_office(self, service:str, office_name:str):
         try:
             new_office = Office()
-            new_office.set_service(service)
+            if service == "gmail":
+                new_office.set_service(gmail)
+            else:
+                self.failure_prompt()
             self.set_home_office(office_name, new_office)
             self.success_prompt()
         except:
