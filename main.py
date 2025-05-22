@@ -17,7 +17,6 @@ def offices() -> OfficeDirectory:
     #with YamlLoader() as loader, open("./modtest/ui/testUI.yml", "r") as datafile:
     #    loader.load(datafile)
 
-    # Adding a random comment
     office_dir.welcome_prompt()
     return office_dir
 
